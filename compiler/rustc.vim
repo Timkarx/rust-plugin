@@ -1,7 +1,7 @@
 " Vim compiler file
 " Compiler:         Rust Compiler
 " Maintainer:       Chris Morgan <me@chrismorgan.info>
-" Latest Revision:  2023-09-11
+" Latest Revision:  2013 Jul 12
 " For bugs, patches and license go to https://github.com/rust-lang/rust.vim
 
 if exists("current_compiler")
@@ -13,6 +13,10 @@ let current_compiler = "rustc"
 let s:save_cpo = &cpo
 set cpo&vim
 " vint: +ProhibitAbbreviationOption
+
+if exists(":CompilerSet") != 2
+    command -nargs=* CompilerSet setlocal <args>
+endif
 
 if get(g:, 'rustc_makeprg_no_percent', 0)
     CompilerSet makeprg=rustc

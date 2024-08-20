@@ -1,8 +1,7 @@
-" Language:	Rust
-" Description:	Vim ftplugin for Rust
-" Maintainer:	Chris Morgan <me@chrismorgan.info>
-" Last Change:	2024 Mar 17
-"		2024 May 23 by Riley Bruins <ribru17@gmail.com ('commentstring')
+" Language:     Rust
+" Description:  Vim ftplugin for Rust
+" Maintainer:   Chris Morgan <me@chrismorgan.info>
+" Last Change:  June 08, 2016
 " For bugs, patches and license go to https://github.com/rust-lang/rust.vim
 
 if exists("b:did_ftplugin")
@@ -37,7 +36,7 @@ if get(g:, 'rust_bang_comment_leader', 0)
 else
     setlocal comments=s0:/*!,ex:*/,s1:/*,mb:*,ex:*/,:///,://!,://
 endif
-setlocal commentstring=//\ %s
+setlocal commentstring=//%s
 setlocal formatoptions-=t formatoptions+=croqnl
 " j was only added in 7.3.541, so stop complaints about its nonexistence
 silent! setlocal formatoptions+=j
@@ -95,15 +94,14 @@ if has('conceal') && get(g:, 'rust_conceal', 0)
 endif
 
 " Motion Commands {{{1
-if !exists("g:no_plugin_maps") && !exists("g:no_rust_maps")
-    " Bind motion commands to support hanging indents
-    nnoremap <silent> <buffer> [[ :call rust#Jump('n', 'Back')<CR>
-    nnoremap <silent> <buffer> ]] :call rust#Jump('n', 'Forward')<CR>
-    xnoremap <silent> <buffer> [[ :call rust#Jump('v', 'Back')<CR>
-    xnoremap <silent> <buffer> ]] :call rust#Jump('v', 'Forward')<CR>
-    onoremap <silent> <buffer> [[ :call rust#Jump('o', 'Back')<CR>
-    onoremap <silent> <buffer> ]] :call rust#Jump('o', 'Forward')<CR>
-endif
+
+" Bind motion commands to support hanging indents
+nnoremap <silent> <buffer> [[ :call rust#Jump('n', 'Back')<CR>
+nnoremap <silent> <buffer> ]] :call rust#Jump('n', 'Forward')<CR>
+xnoremap <silent> <buffer> [[ :call rust#Jump('v', 'Back')<CR>
+xnoremap <silent> <buffer> ]] :call rust#Jump('v', 'Forward')<CR>
+onoremap <silent> <buffer> [[ :call rust#Jump('o', 'Back')<CR>
+onoremap <silent> <buffer> ]] :call rust#Jump('o', 'Forward')<CR>
 
 " Commands {{{1
 
@@ -120,7 +118,7 @@ command! -nargs=* -buffer RustEmitIr call rust#Emit("llvm-ir", <q-args>)
 command! -nargs=* -buffer RustEmitAsm call rust#Emit("asm", <q-args>)
 
 " See |:RustPlay| for docs
-command! -range=% -buffer RustPlay :call rust#Play(<count>, <line1>, <line2>, <f-args>)
+command! -range=% RustPlay :call rust#Play(<count>, <line1>, <line2>, <f-args>)
 
 " See |:RustFmt| for docs
 command! -bar -buffer RustFmt call rustfmt#Format()
@@ -129,13 +127,13 @@ command! -bar -buffer RustFmt call rustfmt#Format()
 command! -range -buffer RustFmtRange call rustfmt#FormatRange(<line1>, <line2>)
 
 " See |:RustInfo| for docs
-command! -bar -buffer RustInfo call rust#debugging#Info()
+command! -bar RustInfo call rust#debugging#Info()
 
 " See |:RustInfoToClipboard| for docs
-command! -bar -buffer RustInfoToClipboard call rust#debugging#InfoToClipboard()
+command! -bar RustInfoToClipboard call rust#debugging#InfoToClipboard()
 
 " See |:RustInfoToFile| for docs
-command! -bar -nargs=1 -buffer RustInfoToFile call rust#debugging#InfoToFile(<f-args>)
+command! -bar -nargs=1 RustInfoToFile call rust#debugging#InfoToFile(<f-args>)
 
 " See |:RustTest| for docs
 command! -buffer -nargs=* -count -bang RustTest call rust#Test(<q-mods>, <count>, <bang>0, <q-args>)
@@ -167,23 +165,17 @@ let b:undo_ftplugin = "
                                 \|unlet b:rust_set_conceallevel
                                 \|endif
                                 \|unlet! b:rust_last_rustc_args b:rust_last_args
-                                \|delcommand -buffer RustRun
-                                \|delcommand -buffer RustExpand
-                                \|delcommand -buffer RustEmitIr
-                                \|delcommand -buffer RustEmitAsm
-                                \|delcommand -buffer RustPlay
-                                \|delcommand -buffer RustFmt
-                                \|delcommand -buffer RustFmtRange
-                                \|delcommand -buffer RustInfo
-                                \|delcommand -buffer RustInfoToClipboard
-                                \|delcommand -buffer RustInfoToFile
-                                \|delcommand -buffer RustTest
-                                \|silent! nunmap <buffer> [[
-                                \|silent! nunmap <buffer> ]]
-                                \|silent! xunmap <buffer> [[
-                                \|silent! xunmap <buffer> ]]
-                                \|silent! ounmap <buffer> [[
-                                \|silent! ounmap <buffer> ]]
+                                \|delcommand RustRun
+                                \|delcommand RustExpand
+                                \|delcommand RustEmitIr
+                                \|delcommand RustEmitAsm
+                                \|delcommand RustPlay
+                                \|nunmap <buffer> [[
+                                \|nunmap <buffer> ]]
+                                \|xunmap <buffer> [[
+                                \|xunmap <buffer> ]]
+                                \|ounmap <buffer> [[
+                                \|ounmap <buffer> ]]
                                 \|setlocal matchpairs-=<:>
                                 \|unlet b:match_skip
                                 \"
@@ -199,39 +191,6 @@ augroup END
 setlocal matchpairs+=<:>
 " For matchit.vim (rustArrow stops `Fn() -> X` messing things up)
 let b:match_skip = 's:comment\|string\|rustCharacter\|rustArrow'
-
-command! -buffer -nargs=+ Cargo call cargo#cmd(<q-args>)
-command! -buffer -nargs=* Cbuild call cargo#build(<q-args>)
-command! -buffer -nargs=* Ccheck call cargo#check(<q-args>)
-command! -buffer -nargs=* Cclean call cargo#clean(<q-args>)
-command! -buffer -nargs=* Cdoc call cargo#doc(<q-args>)
-command! -buffer -nargs=+ Cnew call cargo#new(<q-args>)
-command! -buffer -nargs=* Cinit call cargo#init(<q-args>)
-command! -buffer -nargs=* Crun call cargo#run(<q-args>)
-command! -buffer -nargs=* Ctest call cargo#test(<q-args>)
-command! -buffer -nargs=* Cbench call cargo#bench(<q-args>)
-command! -buffer -nargs=* Cupdate call cargo#update(<q-args>)
-command! -buffer -nargs=* Csearch  call cargo#search(<q-args>)
-command! -buffer -nargs=* Cpublish call cargo#publish(<q-args>)
-command! -buffer -nargs=* Cinstall call cargo#install(<q-args>)
-command! -buffer -nargs=* Cruntarget call cargo#runtarget(<q-args>)
-
-let b:undo_ftplugin .= '
-            \|delcommand -buffer Cargo
-            \|delcommand -buffer Cbuild
-            \|delcommand -buffer Ccheck
-            \|delcommand -buffer Cclean
-            \|delcommand -buffer Cdoc
-            \|delcommand -buffer Cnew
-            \|delcommand -buffer Cinit
-            \|delcommand -buffer Crun
-            \|delcommand -buffer Ctest
-            \|delcommand -buffer Cbench
-            \|delcommand -buffer Cupdate
-            \|delcommand -buffer Csearch
-            \|delcommand -buffer Cpublish
-            \|delcommand -buffer Cinstall
-            \|delcommand -buffer Cruntarget'
 
 " vint: -ProhibitAbbreviationOption
 let &cpo = s:save_cpo

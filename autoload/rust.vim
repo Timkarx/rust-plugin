@@ -1,5 +1,5 @@
 " Description: Helper functions for Rust commands/mappings
-" Last Modified: 2023-09-11
+" Last Modified: May 27, 2014
 " For bugs, patches and license go to https://github.com/rust-lang/rust.vim
 
 function! rust#Load()

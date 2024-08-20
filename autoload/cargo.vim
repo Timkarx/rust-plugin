@@ -1,5 +1,3 @@
-" Last Modified: 2023-09-11
-
 function! cargo#Load()
     " Utility call to get this script loaded, for debugging
 endfunction
